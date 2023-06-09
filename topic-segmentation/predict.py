@@ -30,6 +30,7 @@ def predict(input_dir):
     weights = utils.load_model_weights()
     model = TwoLevelTransformerModel(weights)
     snippet_estimations = model.predict(recordgen.get_dataset(tfrecord_tmpl, True))
+    snippet_estimations = np.reshape(snippet_estimations, (-1, config.snippet_length))
 
     clean_asr = clean_asr.split()
     segmented_clean_asr = [clean_asr[x:x + config.segment_length] for x in range(0, len(clean_asr), config.segment_length)]
@@ -49,7 +50,6 @@ def predict(input_dir):
         for segment_index, segment_estimation in enumerate(segment_estimations):
             real_segment_index = snippet_index + segment_index
             boundaries[real_segment_index].append(segment_estimation)
-    print(boundaries)
     boundaries = [np.mean(x) >= config.segmentation_threshold for x in boundaries]
 
     # Recover the original text and inject the boundary markers.
