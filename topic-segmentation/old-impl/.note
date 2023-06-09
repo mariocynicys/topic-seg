@@ -1,0 +1,4 @@
+Note1: This implementation uses deprecated TF1 constructs and a 2018 deprecated transformers repo
+to construct the encoder stack. The old API is a pain in the butt. Use the keras one.
+
+Note2: There is an issue with drop outs being inverted (1 - actual_value). Dunno if this is fixed here or not. Just don't use it man.
