@@ -1,8 +1,8 @@
 import os
 import sys
-import uuid
 import utils
 import config
+import datetime
 import recordgen
 import preprocess
 from tensorflow import keras
@@ -11,12 +11,13 @@ from TLT import *
 model = None
 
 class StoreWeightsCallback(keras.callbacks.Callback):
-    run_id = str(uuid.uuid4()).split('-')[0]
+    now = datetime.datetime.now()
+    run_id = f"{now.month}-{now.day}_{now.hour}-{now.minute}"
 
     def on_epoch_end(self, epoch, _=None):
         if not os.path.exists("checkpoints"):
             os.mkdir("checkpoints")
-        file_name = os.path.join("checkpoints", self.run_id + '-e' + str(epoch) + ".weights")
+        file_name = os.path.join("checkpoints", self.run_id + '_e' + str(epoch) + ".weights")
         utils.store_model_weights(model, file_name)
 
 
