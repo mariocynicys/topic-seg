@@ -37,7 +37,7 @@ tfrecord_tmpl: str = "data_$.tfrecord"
 segments_per_tfrecord: int = 20_000
 """The maximum number of segments to write to each tf record file."""
 
-batch_size: int = 16
+batch_size: int = 32
 """The training sample batch size."""
 
 learning_rate: float = 0.0001
@@ -72,14 +72,7 @@ def _check_config():
     assert '$' in tfrecord_tmpl, "A tf-record template must contain $ character."
     assert positional_embeddings_length % 2 == 0, "Use an even number for the positional embeddings length since half the size is used for segment level positions and the other half for snippet level positions."
     assert min_words_per_section >= segment_length, "A training section can't be less than one segment (augmented sentence) length."
-    keys = [
-        "num_layers",
-        "num_attention_heads",
-        "attention_dropout",
-        "inner_dim",
-        "inner_dropout",
-        "output_dropout"
-        ]
+    keys = ["num_layers", "num_attention_heads", "inner_dim"]
     dicts = [token_transformer_params, sentence_transformer_params]
     for dictionary in dicts:
         for key in keys:

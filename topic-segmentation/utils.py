@@ -3,7 +3,6 @@ import sys
 import tqdm
 import random
 import subprocess
-import config
 import numpy as np
 from typing import List, Union, Tuple, Any
 
@@ -48,18 +47,16 @@ def bar(it, *args, **kwargs) -> tqdm.tqdm:
         pass
     return tqdm.tqdm(it, *args, **kwargs)
 
-def store_model_weights(model, file_name=None):
+def store_model_weights(model, file_name):
     """Stores the model weights to the file system.
     We refrain from storing the whole model so we don't end up with `batch_size` conflicts,
     since batch size differs in training vs inference.
     """
-    file_name = file_name or config.model_store
     with open(file_name, 'wb') as file:
         np.save(file, model.get_weights())
 
-def load_model_weights(file_name=None):
+def load_model_weights(file_name):
     """Loads the model weights. Used to initialized the model."""
-    file_name = file_name or config.model_store
     return np.load(file_name, allow_pickle=True)
 
 def load_wordvecs(path: str, load_embs=False) -> Union[dict, Tuple[dict, Any]]:

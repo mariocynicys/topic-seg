@@ -11,7 +11,7 @@ config.epochs = 1
 
 def eval(tfrecord_tmpl):
     print("Evaluating...")
-    weights = utils.load_model_weights()
+    weights = utils.load_model_weights(config.model_store)
     model = TwoLevelTransformerModel(weights)
     return model.evaluate(recordgen.get_dataset(tfrecord_tmpl))
 

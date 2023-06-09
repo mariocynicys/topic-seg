@@ -26,7 +26,7 @@ def train(tfrecord_tmpl):
     # Load the model from the file system if it is stored.
     if os.path.exists(config.model_store):
         print("Loading a model from the file system.")
-        weights = utils.load_model_weights()
+        weights = utils.load_model_weights(config.model_store)
         model = TwoLevelTransformerModel(weights)
     else:
         print("Compiling a new model.")
@@ -46,7 +46,7 @@ def train(tfrecord_tmpl):
         )
     except KeyboardInterrupt:
         if input("\nDo you wan't to save that model? (Y/n) ").lower().strip() != "n":
-            utils.store_model_weights(model)
+            utils.store_model_weights(model, config.model_store)
             print("Model weights saved to", config.model_store)
 
 

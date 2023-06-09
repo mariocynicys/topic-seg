@@ -27,7 +27,7 @@ def predict(input_dir):
     tfrecord_tmpl = os.path.join(input_dir, config.tfrecord_tmpl)
     recordgen.record_gen_predict(clean_asr, tfrecord_tmpl)
 
-    weights = utils.load_model_weights()
+    weights = utils.load_model_weights(config.model_store)
     model = TwoLevelTransformerModel(weights)
     snippet_estimations = model.predict(recordgen.get_dataset(tfrecord_tmpl, True))
     snippet_estimations = np.reshape(snippet_estimations, (-1, config.snippet_length))
