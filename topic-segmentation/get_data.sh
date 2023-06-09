@@ -12,7 +12,7 @@ pip install gdown
 # Download wiki_727K.tar.bz2
 gdown 124oH8sx9i3hjSNpl7UJUP4moQeyZLvQj
 # Decompress the tar file.
-tar -xjvf wiki_727K.tar.bz2
+tar -xjf wiki_727K.tar.bz2
 # tar omits the `K` for some reason (at least on my machine), add it back.
 mv wiki_727 wiki_727K
 
