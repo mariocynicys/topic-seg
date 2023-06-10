@@ -50,14 +50,13 @@ def predict(input_dir):
         for segment_index, segment_estimation in enumerate(segment_estimations):
             real_segment_index = snippet_index + segment_index
             boundaries[real_segment_index].append(segment_estimation)
-    boundaries = [np.mean(x) >= config.segmentation_threshold for x in boundaries]
 
     # Recover the original text and inject the boundary markers.
     words = []
     original_asr_index = 0
-    for segment, is_boundary in zip(segmented_clean_asr, boundaries):
+    for segment, b in zip(segmented_clean_asr, boundaries):
         # If this segment is a boundary, prepend two line breaks before writing it.
-        if is_boundary:
+        if original_asr_index != 0 and config.is_boundary(b):
             words.append("\n\n")
 
         # Write the segment and sync it with the original word list.
@@ -72,7 +71,7 @@ def predict(input_dir):
     for word in recovery_list[original_asr_index:]:
         words.append(word)
 
-    open(os.path.basename(input_file) + ".segmented", 'w').write(' '.join(words))
+    open(os.path.basename(input_file) + ".segmented", 'w').write(' '.join(words).replace(" \n\n ", "\n\n"))
 
 
 if __name__ == "__main__":

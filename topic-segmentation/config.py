@@ -1,8 +1,12 @@
 """A file containing the global configuration parameters for the model."""
 
 
-segmentation_threshold: float = 0.5
-"""The threshold based one we decide a segment/augmented sentence is a topic boundary or not."""
+def is_boundary(segmentations: list) -> bool:
+    """A function the tells whether this segment should be a topic boundary or not.
+    `segmentations` is a list of segmentation probabilities for the same segment but across multiple snippets.
+    """
+    import numpy as np
+    return np.mean(np.sort(segmentations)[-5:]) >= 0.35
 
 word2vec_file_path: str = "data/embeddings/wiki1m-trimmed.vec"
 """Where the word2vec embeddings at. This should be the path to a .vec embeddings file."""
