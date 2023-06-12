@@ -59,8 +59,10 @@ def TwoLevelTransformerModel(weights=None, word_repr=None):
     # Combine all of these to get an embeddings vector for each token
     token_embeddings = tf.concat([snippet_pos_embeddings, segment_pos_embeddings, word_embeddings], axis=3)
 
-    # Reshape the token embeddings to suppress `config.snippet_length`, this is because the token transformer
-    # processes the input in segment level and doesn't know about snippets.
+    # Reshape the token embeddings to suppress `config.snippet_length` dimension, this is because
+    # the token transformer processes the input in segment level and doesn't know about snippets.
+    # NOTE: We could avoid reshaping if we were to specify `attention_axes=2` for the encoder stack,
+    # but this makes the pipeline 3x slower for some reason.
     token_embeddings = tf.reshape(token_embeddings, [config.batch_size * config.snippet_length, config.segment_length, -1])
     transformed_token_embeddings = encoder.EncoderStack(**config.token_transformer_params)(token_embeddings)
 
