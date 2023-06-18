@@ -21,7 +21,7 @@ class StoreWeightsCallback(keras.callbacks.Callback):
         utils.store_model_weights(model, file_name)
 
 
-def train(tfrecord_tmpl):
+def train(train_tfrecord_tmpl, val_tfrecord_tmpl):
     global model
     # Load the model from the file system if it is stored.
     if os.path.exists(config.model_store):
@@ -33,16 +33,18 @@ def train(tfrecord_tmpl):
         _, word_repr = utils.load_wordvecs(config.word2vec_file_path, load_embs=True)
         model = TwoLevelTransformerModel(word_repr=word_repr)
 
-    batch_count = recordgen.get_batch_count(tfrecord_tmpl)
+    batch_count = recordgen.get_batch_count(train_tfrecord_tmpl)
     print("Number of training batches =", batch_count)
     print("Number of training epochs =", config.epochs)
     print("Training...")
 
-    dataset = recordgen.get_dataset(tfrecord_tmpl)
+    train_dataset = recordgen.get_dataset(train_tfrecord_tmpl)
+    val_dataset = recordgen.get_dataset(val_tfrecord_tmpl)
     try:
         model.fit(
-            dataset, steps_per_epoch=batch_count,
-            epochs=config.epochs, callbacks=[StoreWeightsCallback()]
+            train_dataset, steps_per_epoch=batch_count,
+            epochs=config.epochs, callbacks=[StoreWeightsCallback()],
+            validation_data=val_dataset
         )
     except KeyboardInterrupt:
         if input("\nDo you wan't to save that model? (Y/n) ").lower().strip() != "n":
@@ -51,12 +53,15 @@ def train(tfrecord_tmpl):
 
 
 if __name__ == "__main__":
-    input_dir = sys.argv[1]
-    tfrecord_tmpl = os.path.join(input_dir, config.tfrecord_tmpl)
-    skip_preprocessing = (len(sys.argv) > 2)
+    training_dir, validation_dir = sys.argv[1], sys.argv[2]
+    train_tfrecord_tmpl = os.path.join(training_dir, config.tfrecord_tmpl)
+    val_tfrecord_tmpl = os.path.join(validation_dir, config.tfrecord_tmpl)
+    skip_preprocessing = (len(sys.argv) > 3)
     if not skip_preprocessing:
-        preprocess.preprocess_wiki(input_dir)
-        recordgen.record_gen(input_dir, tfrecord_tmpl)
+        preprocess.preprocess_wiki(training_dir)
+        recordgen.record_gen(training_dir, train_tfrecord_tmpl)
+        preprocess.preprocess_wiki(validation_dir)
+        recordgen.record_gen(validation_dir, val_tfrecord_tmpl)
     else:
         print("Skipping preprocessing!")
-    train(tfrecord_tmpl)
+    train(train_tfrecord_tmpl, val_tfrecord_tmpl)
